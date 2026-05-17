@@ -5,6 +5,8 @@ using Rymote.Reflex.Core;
 
 namespace Rymote.Reflex.Collections;
 
+/// <summary>Reactive proxy over an <see cref="IList{T}"/> that tracks index-level and count-level reads and notifies effects on mutation.</summary>
+/// <typeparam name="TItem">Element type of the list.</typeparam>
 public sealed class ReactiveListWrapper<TItem> : IList<TItem>
 {
     private readonly IList<TItem> _innerList;
@@ -15,6 +17,8 @@ public sealed class ReactiveListWrapper<TItem> : IList<TItem>
 
     private event Action<ListChangeEvent<TItem>>? _changeHandlers;
 
+    /// <summary>Initializes a new <see cref="ReactiveListWrapper{TItem}"/> that proxies the given list.</summary>
+    /// <param name="innerList">The underlying BCL list to wrap.</param>
     public ReactiveListWrapper(IList<TItem> innerList)
     {
         ArgumentNullException.ThrowIfNull(innerList);
@@ -31,6 +35,7 @@ public sealed class ReactiveListWrapper<TItem> : IList<TItem>
         return indexSlot;
     }
 
+    /// <summary>Returns an <see cref="System.IObservable{T}"/> that emits a <see cref="ListChangeEvent{TItem}"/> each time the list is mutated.</summary>
     public System.IObservable<ListChangeEvent<TItem>> AsChangeObservable()
     {
         return new Interop.ChangeObservableAdapter<ListChangeEvent<TItem>>(
@@ -42,6 +47,8 @@ public sealed class ReactiveListWrapper<TItem> : IList<TItem>
     {
         _changeHandlers?.Invoke(changeEvent);
     }
+
+    public int InternalTrackedSlotCount => _indexSlots.Count;
 
     public int Count
     {
@@ -102,6 +109,7 @@ public sealed class ReactiveListWrapper<TItem> : IList<TItem>
         {
             _innerList.Clear();
             slotsToNotify = new List<DependencySlot>(_indexSlots.Values);
+            _indexSlots.Clear();
         }
         foreach (DependencySlot indexSlot in slotsToNotify)
             indexSlot.NotifyAllSubscribers();
@@ -190,9 +198,16 @@ public sealed class ReactiveListWrapper<TItem> : IList<TItem>
         List<DependencySlot> slotsToNotify;
         lock (_writeLock)
         {
+            int newCount = _innerList.Count;
             slotsToNotify = new List<DependencySlot>();
+            List<int> outOfBoundsKeys = new();
             foreach (var entry in _indexSlots)
+            {
                 if (entry.Key >= removedAtIndex) slotsToNotify.Add(entry.Value);
+                if (entry.Key >= newCount) outOfBoundsKeys.Add(entry.Key);
+            }
+            foreach (int outOfBoundsKey in outOfBoundsKeys)
+                _indexSlots.Remove(outOfBoundsKey);
         }
         foreach (DependencySlot indexSlot in slotsToNotify)
             indexSlot.NotifyAllSubscribers();

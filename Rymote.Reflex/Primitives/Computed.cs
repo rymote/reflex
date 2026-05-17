@@ -4,6 +4,8 @@ using Rymote.Reflex.Core;
 
 namespace Rymote.Reflex.Primitives;
 
+/// <summary>A lazily-evaluated derived value that caches its result and re-evaluates when any reactive dependency changes.</summary>
+/// <typeparam name="TValue">Type of the computed result.</typeparam>
 public sealed class Computed<TValue>
 {
     private readonly Func<TValue> _evaluateFunction;
@@ -14,6 +16,9 @@ public sealed class Computed<TValue>
     private bool _cacheIsDirty = true;
     private int _isEvaluating;
 
+    /// <summary>Initializes a new <see cref="Computed{TValue}"/> backed by the given evaluation function.</summary>
+    /// <param name="evaluateFunction">A pure function whose reactive reads form the dependency graph.
+    /// The function is not called until <see cref="Value"/> is first accessed.</param>
     public Computed(Func<TValue> evaluateFunction)
     {
         ArgumentNullException.ThrowIfNull(evaluateFunction);
@@ -21,6 +26,8 @@ public sealed class Computed<TValue>
         _invalidationEffect = new ReactiveEffect(_ => MarkDirtyAndPropagate(), "<computed>");
     }
 
+    /// <summary>Gets the current computed value. Re-evaluates if the cache is stale. Reads inside an active effect register a dependency.</summary>
+    /// <exception cref="InvalidOperationException">Thrown if the evaluation function reads its own <see cref="Value"/> (recursive evaluation).</exception>
     public TValue Value
     {
         get

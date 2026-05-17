@@ -33,4 +33,41 @@ public sealed class ReactiveSetTests
         Assert.True(aliceOnlineObserved);
         Assert.Equal(bobRunsBeforeAliceAdd, bobEffectRunCount);
     }
+
+    [Fact]
+    public void Value_slots_are_dropped_after_removing_all_items()
+    {
+        ReactiveSetWrapper<int> numbers = new(new HashSet<int>());
+
+        for (int itemIndex = 0; itemIndex < 100; itemIndex++)
+        {
+            numbers.Add(itemIndex);
+            _ = numbers.Contains(itemIndex);
+        }
+
+        Assert.Equal(100, numbers.InternalTrackedSlotCount);
+
+        for (int itemIndex = 0; itemIndex < 100; itemIndex++)
+            numbers.Remove(itemIndex);
+
+        Assert.Equal(0, numbers.InternalTrackedSlotCount);
+    }
+
+    [Fact]
+    public void Value_slots_are_dropped_on_clear()
+    {
+        ReactiveSetWrapper<int> numbers = new(new HashSet<int>());
+
+        for (int itemIndex = 0; itemIndex < 100; itemIndex++)
+        {
+            numbers.Add(itemIndex);
+            _ = numbers.Contains(itemIndex);
+        }
+
+        Assert.Equal(100, numbers.InternalTrackedSlotCount);
+
+        numbers.Clear();
+
+        Assert.Equal(0, numbers.InternalTrackedSlotCount);
+    }
 }

@@ -5,6 +5,8 @@ using Rymote.Reflex.Core;
 
 namespace Rymote.Reflex.Collections;
 
+/// <summary>Reactive proxy over an <see cref="ISet{T}"/> that tracks per-value reads and notifies effects on mutation.</summary>
+/// <typeparam name="TItem">Element type of the set.</typeparam>
 public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
     where TItem : notnull
 {
@@ -16,6 +18,8 @@ public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
 
     private event Action<SetChangeEvent<TItem>>? _changeHandlers;
 
+    /// <summary>Initializes a new <see cref="ReactiveSetWrapper{TItem}"/> that proxies the given set.</summary>
+    /// <param name="innerSet">The underlying BCL set to wrap.</param>
     public ReactiveSetWrapper(ISet<TItem> innerSet)
     {
         ArgumentNullException.ThrowIfNull(innerSet);
@@ -33,6 +37,7 @@ public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
         return slot;
     }
 
+    /// <summary>Returns an <see cref="System.IObservable{T}"/> that emits a <see cref="SetChangeEvent{TItem}"/> each time the set is mutated.</summary>
     public System.IObservable<SetChangeEvent<TItem>> AsChangeObservable()
     {
         return new Interop.ChangeObservableAdapter<SetChangeEvent<TItem>>(
@@ -44,6 +49,8 @@ public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
     {
         _changeHandlers?.Invoke(changeEvent);
     }
+
+    public int InternalTrackedSlotCount => _valueSlots.Count;
 
     public int Count
     {
@@ -82,6 +89,7 @@ public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
         {
             _innerSet.Clear();
             slotsToNotify = new List<DependencySlot>(_valueSlots.Values);
+            _valueSlots.Clear();
         }
         foreach (DependencySlot slot in slotsToNotify) slot.NotifyAllSubscribers();
         _iterationSlot.NotifyAllSubscribers();
@@ -111,6 +119,7 @@ public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
         {
             wasRemoved = _innerSet.Remove(item);
             _valueSlots.TryGetValue(item, out valueSlot);
+            _valueSlots.Remove(item);
         }
         if (!wasRemoved) return false;
         valueSlot?.NotifyAllSubscribers();

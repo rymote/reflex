@@ -18,7 +18,13 @@
     <PackageProjectUrl>https://github.com/rymote/reflex</PackageProjectUrl>
     <PackageTags>reactive;reactivity;vue;ref;computed;effect;observer;source-generator;analyzer</PackageTags>
     <IncludeBuildOutput>true</IncludeBuildOutput>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rymote.Reflex.Generators\Rymote.Reflex.Generators.csproj"
                       OutputItemType="Analyzer"

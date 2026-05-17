@@ -71,4 +71,41 @@ public sealed class ReactiveListTests
         values.RemoveAt(0);
         Assert.Equal(9, observedSum);
     }
+
+    [Fact]
+    public void Index_slots_are_dropped_after_clearing_all_items()
+    {
+        ReactiveListWrapper<int> values = new(new List<int>());
+
+        for (int itemIndex = 0; itemIndex < 100; itemIndex++)
+            values.Add(itemIndex);
+
+        for (int itemIndex = 0; itemIndex < 100; itemIndex++)
+            _ = values[itemIndex];
+
+        Assert.Equal(100, values.InternalTrackedSlotCount);
+
+        values.Clear();
+
+        Assert.Equal(0, values.InternalTrackedSlotCount);
+    }
+
+    [Fact]
+    public void Index_slots_are_dropped_after_removing_items_one_by_one()
+    {
+        ReactiveListWrapper<int> values = new(new List<int>());
+
+        for (int itemIndex = 0; itemIndex < 10; itemIndex++)
+            values.Add(itemIndex);
+
+        for (int itemIndex = 0; itemIndex < 10; itemIndex++)
+            _ = values[itemIndex];
+
+        Assert.Equal(10, values.InternalTrackedSlotCount);
+
+        while (values.Count > 0)
+            values.RemoveAt(values.Count - 1);
+
+        Assert.Equal(0, values.InternalTrackedSlotCount);
+    }
 }

@@ -4,12 +4,17 @@ using Rymote.Reflex.Observers;
 
 namespace Rymote.Reflex.Core;
 
+/// <summary>Owns a group of reactive effects and child scopes, disposing them all when the scope is disposed.</summary>
 public sealed class EffectScope : IDisposable
 {
     private readonly List<IDisposable> _attachedSubscriptions = new();
     private readonly List<EffectScope> _childScopes = new();
     private bool _isDisposed;
 
+    /// <summary>Creates and registers a reactive effect within this scope. The effect is disposed when the scope is disposed.</summary>
+    /// <param name="effectCallback">The effect body.</param>
+    /// <param name="debugName">Optional name shown in diagnostics and error messages.</param>
+    /// <returns>A disposable that stops the effect before the scope is disposed.</returns>
     public IDisposable Effect(Action effectCallback, string? debugName = null)
     {
         ThrowIfDisposed();
@@ -18,6 +23,10 @@ public sealed class EffectScope : IDisposable
         return subscription;
     }
 
+    /// <summary>Creates and registers a self-referencing reactive effect within this scope.</summary>
+    /// <param name="effectCallbackWithSelf">Effect body that receives its own subscription handle.</param>
+    /// <param name="debugName">Optional name shown in diagnostics and error messages.</param>
+    /// <returns>A disposable that stops the effect before the scope is disposed.</returns>
     public IDisposable Effect(Action<IDisposable> effectCallbackWithSelf, string? debugName = null)
     {
         ThrowIfDisposed();
@@ -26,6 +35,8 @@ public sealed class EffectScope : IDisposable
         return subscription;
     }
 
+    /// <summary>Creates a child scope whose lifetime is tied to this scope.</summary>
+    /// <returns>A new, empty child <see cref="EffectScope"/>.</returns>
     public EffectScope CreateChildScope()
     {
         ThrowIfDisposed();
@@ -34,6 +45,7 @@ public sealed class EffectScope : IDisposable
         return childScope;
     }
 
+    /// <summary>Disposes all child scopes and effects registered in this scope.</summary>
     public void Dispose()
     {
         if (_isDisposed) return;

@@ -4,12 +4,15 @@ using Rymote.Reflex.Core;
 
 namespace Rymote.Reflex.Scheduling;
 
+/// <summary>Production scheduler that dispatches reactive effects on the thread pool.
+/// Normal effects run first; post-tick effects run after all normal effects have completed.</summary>
 public sealed class ThreadPoolScheduler : IReflexScheduler
 {
     private readonly ConcurrentQueue<ReactiveEffect> _normalQueue = new();
     private readonly ConcurrentQueue<ReactiveEffect> _postQueue = new();
     private int _drainScheduled;
 
+    /// <inheritdoc/>
     public void Schedule(ReactiveEffect effect)
     {
         if (!effect.MarkPending()) return;
@@ -25,6 +28,7 @@ public sealed class ThreadPoolScheduler : IReflexScheduler
         }
     }
 
+    /// <inheritdoc/>
     public void FlushPendingNow() { Drain(); }
 
     private void Drain()

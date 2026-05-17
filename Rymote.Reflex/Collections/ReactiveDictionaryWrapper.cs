@@ -5,6 +5,9 @@ using Rymote.Reflex.Core;
 
 namespace Rymote.Reflex.Collections;
 
+/// <summary>Reactive proxy over an <see cref="IDictionary{TKey,TValue}"/> that tracks per-key reads and notifies effects on mutation.</summary>
+/// <typeparam name="TKey">Key type.</typeparam>
+/// <typeparam name="TValue">Value type.</typeparam>
 public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, TValue>
     where TKey : notnull
 {
@@ -16,6 +19,8 @@ public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, 
 
     private event Action<DictionaryChangeEvent<TKey, TValue>>? _changeHandlers;
 
+    /// <summary>Initializes a new <see cref="ReactiveDictionaryWrapper{TKey,TValue}"/> that proxies the given dictionary.</summary>
+    /// <param name="innerDictionary">The underlying BCL dictionary to wrap.</param>
     public ReactiveDictionaryWrapper(IDictionary<TKey, TValue> innerDictionary)
     {
         ArgumentNullException.ThrowIfNull(innerDictionary);
@@ -33,6 +38,7 @@ public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, 
         return keySlot;
     }
 
+    /// <summary>Returns an <see cref="System.IObservable{T}"/> that emits a <see cref="DictionaryChangeEvent{TKey,TValue}"/> each time the dictionary is mutated.</summary>
     public System.IObservable<DictionaryChangeEvent<TKey, TValue>> AsChangeObservable()
     {
         return new Interop.ChangeObservableAdapter<DictionaryChangeEvent<TKey, TValue>>(
@@ -112,6 +118,8 @@ public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, 
 
     public void Add(KeyValuePair<TKey, TValue> entryToAdd) => this[entryToAdd.Key] = entryToAdd.Value;
 
+    public int InternalTrackedSlotCount => _keySlots.Count;
+
     public void Clear()
     {
         List<DependencySlot> slotsToNotify;
@@ -119,6 +127,7 @@ public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, 
         {
             _innerDictionary.Clear();
             slotsToNotify = new List<DependencySlot>(_keySlots.Values);
+            _keySlots.Clear();
         }
         foreach (DependencySlot keySlot in slotsToNotify) keySlot.NotifyAllSubscribers();
         _countSlot.NotifyAllSubscribers();
@@ -171,6 +180,7 @@ public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, 
                 return false;
             removed = _innerDictionary.Remove(key);
             _keySlots.TryGetValue(key, out keySlot);
+            _keySlots.Remove(key);
         }
         if (!removed) return false;
         keySlot?.NotifyAllSubscribers();

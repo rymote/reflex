@@ -56,4 +56,41 @@ public sealed class ReactiveDictionaryTests
         sessions.Remove(1);
         Assert.Equal(1, observedCount);
     }
+
+    [Fact]
+    public void Key_slots_are_dropped_after_removing_all_entries()
+    {
+        ReactiveDictionaryWrapper<int, string> lookup = new(new Dictionary<int, string>());
+
+        for (int entryIndex = 0; entryIndex < 100; entryIndex++)
+        {
+            lookup[entryIndex] = entryIndex.ToString();
+            _ = lookup.ContainsKey(entryIndex);
+        }
+
+        Assert.Equal(100, lookup.InternalTrackedSlotCount);
+
+        for (int entryIndex = 0; entryIndex < 100; entryIndex++)
+            lookup.Remove(entryIndex);
+
+        Assert.Equal(0, lookup.InternalTrackedSlotCount);
+    }
+
+    [Fact]
+    public void Key_slots_are_dropped_on_clear()
+    {
+        ReactiveDictionaryWrapper<int, string> lookup = new(new Dictionary<int, string>());
+
+        for (int entryIndex = 0; entryIndex < 100; entryIndex++)
+        {
+            lookup[entryIndex] = entryIndex.ToString();
+            _ = lookup.ContainsKey(entryIndex);
+        }
+
+        Assert.Equal(100, lookup.InternalTrackedSlotCount);
+
+        lookup.Clear();
+
+        Assert.Equal(0, lookup.InternalTrackedSlotCount);
+    }
 }

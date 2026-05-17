@@ -3,12 +3,15 @@ using Rymote.Reflex.Core;
 
 namespace Rymote.Reflex.Scheduling;
 
+/// <summary>Test scheduler that runs reactive effects synchronously on the calling thread.
+/// Use this in unit tests to avoid timing-related non-determinism. Not safe for concurrent use.</summary>
 public sealed class SynchronousTestScheduler : IReflexScheduler
 {
     private readonly Queue<ReactiveEffect> _normalQueue = new();
     private readonly Queue<ReactiveEffect> _postQueue = new();
     private bool _isDraining;
 
+    /// <inheritdoc/>
     public void Schedule(ReactiveEffect effect)
     {
         if (!effect.MarkPending()) return;
@@ -40,5 +43,6 @@ public sealed class SynchronousTestScheduler : IReflexScheduler
         }
     }
 
+    /// <inheritdoc/>
     public void FlushPendingNow() { }
 }
