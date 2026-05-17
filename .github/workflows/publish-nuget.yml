@@ -37,22 +37,6 @@ jobs:
             --output ./artifacts \
             /p:Version=${{ env.VERSION }}
 
-      - name: Pack Rymote.Reflex.Generators
-        run: |
-          dotnet pack Rymote.Reflex.Generators/Rymote.Reflex.Generators.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./artifacts \
-            /p:Version=${{ env.VERSION }}
-
-      - name: Pack Rymote.Reflex.Analyzers
-        run: |
-          dotnet pack Rymote.Reflex.Analyzers/Rymote.Reflex.Analyzers.csproj \
-            --configuration Release \
-            --no-build \
-            --output ./artifacts \
-            /p:Version=${{ env.VERSION }}
-
       - name: Push to nuget.org
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

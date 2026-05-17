@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -8,6 +8,16 @@
     <AssemblyName>Rymote.Reflex</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IsPackable>true</IsPackable>
+    <PackageId>Rymote.Reflex</PackageId>
+    <Description>Vue.js-style reactive primitives for .NET 10 — Ref, Computed, Effect, Watch, reactive collections, and a [Reactive] source generator. Designed for server-side use.</Description>
+    <Authors>Rymote</Authors>
+    <Company>Rymote</Company>
+    <RepositoryUrl>https://github.com/rymote/reflex</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/rymote/reflex</PackageProjectUrl>
+    <PackageTags>reactive;reactivity;vue;ref;computed;effect;observer;source-generator;analyzer</PackageTags>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rymote.Reflex.Generators\Rymote.Reflex.Generators.csproj"
@@ -16,5 +26,15 @@
     <ProjectReference Include="..\Rymote.Reflex.Analyzers\Rymote.Reflex.Analyzers.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Rymote.Reflex.Generators\bin\$(Configuration)\netstandard2.0\Rymote.Reflex.Generators.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false" />
+    <None Include="..\Rymote.Reflex.Analyzers\bin\$(Configuration)\netstandard2.0\Rymote.Reflex.Analyzers.dll"
+          Pack="true"
+          PackagePath="analyzers/dotnet/cs"
+          Visible="false" />
   </ItemGroup>
 </Project>
