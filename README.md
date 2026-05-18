@@ -1,10 +1,15 @@
 <div align="center">
-  Rymote.Reflex - Vue.js-style reactive primitives for .NET 10
+    <a href="https://github.com/rymote/reflex"><img src="https://github.com/rymote/reflex/blob/master/.github/rymote-reflex-cover.png" alt="rymote/reflex" /></a>
+</div>
+<br />
+
+<div align="center">
+  Rymote.Reflex - Fine-grained reactive primitives for .NET
 </div>
 
 <div align="center">
   <sub>
-    Brought to you by 
+    Brought to you by
     <a href="https://github.com/jovanivanovic">@jovanivanovic</a>,
     <a href="https://github.com/rymote">@rymote</a>
   </sub>
@@ -12,24 +17,24 @@
 
 ## Overview
 
-Rymote.Reflex brings Vue.js-style fine-grained reactivity to server-side .NET 10. It provides `Ref<T>`, `Computed<T>`, `Effect`, `Watch`, reactive collection wrappers, and a Roslyn source generator that turns plain `[Reactive]` POCO classes into fully-tracked objects — all without any virtual-machine, JavaScript runtime, or UI framework dependency.
+Rymote.Reflex brings fine-grained reactivity to server-side .NET 10. It provides `Ref<T>`, `Computed<T>`, `Effect`, `Watch`, reactive collection wrappers, and a Roslyn source generator that turns plain `[Reactive]` POCO classes into fully-tracked objects — with no UI framework dependency.
 
 The library is designed for scenarios where you need observable state that drives derived computations and side effects: real-time backends, game servers, rule engines, data pipelines, and any other server-side workload that benefits from push-based reactivity without polling.
 
 Reactivity is tracked at the sub-property level. Reading `session.UserName` inside an effect subscribes only to `UserName`, not to the entire object. Writes notify only the effects that actually read the changed value, keeping CPU overhead proportional to the number of observers rather than the size of the object graph.
 
-## Key Features
+## Features
 
-- ⚡ **Fine-grained tracking** — per-property and per-index dependency slots; no dirty-checking or full-tree diffing
-- 🧮 **Lazy computed values** — `Computed<T>` caches results and re-evaluates only when a dependency changes
-- 🔁 **Effect system** — effects run automatically when their reactive reads change; self-disposing effects supported
-- 👁️ **Watch subscriptions** — `Watch` fires `(oldValue, newValue)` callbacks on `Ref`, `Computed`, or any selector
-- 📦 **Reactive collections** — `Reflex.Reactive(list/dict/set)` wraps BCL collections with per-index/per-key tracking and `IObservable` change streams
-- 🏷️ **[Reactive] source generator** — annotate a `partial` class; the generator emits reactive backing fields and `Compute*` method wiring at compile time
-- 🔬 **Roslyn analyzers** — seven built-in diagnostics catch common mistakes (missing `partial`, escaping inner collections, mutation during iteration, etc.)
-- 🔄 **IObservable / IAsyncEnumerable interop** — convert any reactive primitive to a standard stream
-- 🧵 **Concurrency-safe** — per-source write locks; `AsyncLocal`-flowed dependency tracking; batching via `Reflex.Batch()`
-- 🧪 **Test-friendly** — swap in `SynchronousTestScheduler` for deterministic, single-threaded test runs
+- **Fine-grained tracking** — per-property and per-index dependency slots; no dirty-checking or full-tree diffing.
+- **Lazy computed values** — `Computed<T>` caches results and re-evaluates only when a dependency changes.
+- **Effect system** — effects run automatically when their reactive reads change; self-disposing effects supported.
+- **Watch subscriptions** — `Watch` fires `(oldValue, newValue)` callbacks on `Ref`, `Computed`, or any selector.
+- **Reactive collections** — `Reflex.Reactive(list/dict/set)` wraps BCL collections with per-index/per-key tracking and `IObservable` change streams.
+- **[Reactive] source generator** — annotate a `partial` class; the generator emits reactive backing fields and `Compute*` method wiring at compile time.
+- **Roslyn analyzers** — seven built-in diagnostics catch common mistakes (missing `partial`, escaping inner collections, mutation during iteration, etc.).
+- **IObservable / IAsyncEnumerable interop** — convert any reactive primitive to a standard stream.
+- **Concurrency-safe** — per-source write locks; `AsyncLocal`-flowed dependency tracking; batching via `Reflex.Batch()`.
+- **Test-friendly** — swap in `SynchronousTestScheduler` for deterministic, single-threaded test runs.
 
 ## Installation
 
@@ -39,7 +44,7 @@ dotnet add package Rymote.Reflex
 
 The package bundles the runtime, the source generator, and the analyzers. No additional references are required.
 
-## Quick Start
+## Quick start
 
 ### Ref + Effect
 
@@ -109,7 +114,7 @@ messages.Add("World");   // Output: Message count: 2
 messages.RemoveAt(0);    // Output: Message count: 1
 ```
 
-## API Surface
+## API surface
 
 | Method | Description |
 |---|---|
@@ -172,9 +177,16 @@ public partial class ShoppingCart
 | REFLEX006 | Warning | More than one `Reflex.Configure` call site detected |
 | REFLEX007 | Info | `Reflex.Effect` lambda captures `this` of a `[Reactive]` class but reads no reactive property |
 
+## Support the project
+
+If Reflex has helped you ship faster, please consider supporting ongoing development:
+
+- [Patreon](https://www.patreon.com/rymote)
+- [Open Collective](https://opencollective.com/rymote)
+
 ## License
 
-This project is licensed under the MIT License — see [LICENSE.md](./LICENSE.md) for details.
+This project is licensed under the BSD 3-Clause License — see [LICENSE.md](./LICENSE.md) for details.
 
 ## Authors
 
