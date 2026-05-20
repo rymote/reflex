@@ -48,7 +48,7 @@ public sealed class ReactiveListWrapper<TItem> : IList<TItem>
         _changeHandlers?.Invoke(changeEvent);
     }
 
-    public int InternalTrackedSlotCount => _indexSlots.Count;
+    internal int InternalTrackedSlotCount => _indexSlots.Count;
 
     public int Count
     {

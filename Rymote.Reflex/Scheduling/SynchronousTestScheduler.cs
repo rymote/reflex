@@ -9,6 +9,7 @@ public sealed class SynchronousTestScheduler : IReflexScheduler
 {
     private readonly Queue<ReactiveEffect> _normalQueue = new();
     private readonly Queue<ReactiveEffect> _postQueue = new();
+    private int _scheduleSequenceDepth;
     private bool _isDraining;
 
     /// <inheritdoc/>
@@ -19,8 +20,35 @@ public sealed class SynchronousTestScheduler : IReflexScheduler
         if (effect.IsPostTick) _postQueue.Enqueue(effect);
         else _normalQueue.Enqueue(effect);
 
-        if (_isDraining) return;
+        if (_scheduleSequenceDepth > 0) return;
 
+        DrainAllQueues();
+    }
+
+    /// <inheritdoc/>
+    public void FlushPendingNow()
+    {
+        DrainAllQueues();
+    }
+
+    /// <inheritdoc/>
+    public void BeginScheduleSequence()
+    {
+        _scheduleSequenceDepth++;
+    }
+
+    /// <inheritdoc/>
+    public void EndScheduleSequence()
+    {
+        if (_scheduleSequenceDepth == 0) return;
+        _scheduleSequenceDepth--;
+        if (_scheduleSequenceDepth == 0)
+            DrainAllQueues();
+    }
+
+    private void DrainAllQueues()
+    {
+        if (_isDraining) return;
         _isDraining = true;
         try
         {
@@ -42,7 +70,4 @@ public sealed class SynchronousTestScheduler : IReflexScheduler
             _isDraining = false;
         }
     }
-
-    /// <inheritdoc/>
-    public void FlushPendingNow() { }
 }

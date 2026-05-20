@@ -118,7 +118,7 @@ public sealed class ReactiveDictionaryWrapper<TKey, TValue> : IDictionary<TKey, 
 
     public void Add(KeyValuePair<TKey, TValue> entryToAdd) => this[entryToAdd.Key] = entryToAdd.Value;
 
-    public int InternalTrackedSlotCount => _keySlots.Count;
+    internal int InternalTrackedSlotCount => _keySlots.Count;
 
     public void Clear()
     {

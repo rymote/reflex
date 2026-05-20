@@ -10,13 +10,13 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <IsPackable>true</IsPackable>
     <PackageId>Rymote.Reflex</PackageId>
-    <Description>Vue.js-style reactive primitives for .NET 10 — Ref, Computed, Effect, Watch, reactive collections, and a [Reactive] source generator. Designed for server-side use.</Description>
+    <Description>Fine-grained reactive primitives for .NET 10 — Ref, Computed, Effect, Watch, reactive collections, and a [Reactive] source generator. Designed for server-side use.</Description>
     <Authors>Rymote</Authors>
     <Company>Rymote</Company>
     <RepositoryUrl>https://github.com/rymote/reflex</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/rymote/reflex</PackageProjectUrl>
-    <PackageTags>reactive;reactivity;vue;ref;computed;effect;observer;source-generator;analyzer</PackageTags>
+    <PackageTags>reactive;reactivity;ref;computed;effect;observer;source-generator;analyzer</PackageTags>
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -24,6 +24,9 @@
   <ItemGroup>
     <None Include="..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Rymote.Reflex.Tests" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rymote.Reflex.Generators\Rymote.Reflex.Generators.csproj"

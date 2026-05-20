@@ -50,7 +50,16 @@ internal static class BatchStack
             return;
         }
 
-        foreach (ReactiveEffect dirtyEffect in dirtyEffectsFromFrame)
-            dirtyEffect.EnqueueOnScheduler();
+        Rymote.Reflex.Scheduling.IReflexScheduler scheduler = ReflexConfiguration.ActiveOptions.Scheduler;
+        scheduler.BeginScheduleSequence();
+        try
+        {
+            foreach (ReactiveEffect dirtyEffect in dirtyEffectsFromFrame)
+                dirtyEffect.EnqueueOnScheduler();
+        }
+        finally
+        {
+            scheduler.EndScheduleSequence();
+        }
     }
 }

@@ -50,7 +50,7 @@ public sealed class ReactiveSetWrapper<TItem> : ISet<TItem>
         _changeHandlers?.Invoke(changeEvent);
     }
 
-    public int InternalTrackedSlotCount => _valueSlots.Count;
+    internal int InternalTrackedSlotCount => _valueSlots.Count;
 
     public int Count
     {
